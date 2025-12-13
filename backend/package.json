@@ -1,7 +1,7 @@
 {
-  "name": "trello-clone-backend",
+  "name": "easytask-backend",
   "version": "1.0.0",
-  "description": "Backend for Trello-like task manager",
+  "description": "Backend for EasyTask",
   "main": "server.js",
   "type": "module",
   "scripts": {

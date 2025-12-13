@@ -99,7 +99,7 @@ onMounted(() => {
 	<header class="app-header">
 		<div class="header-content">
 			<router-link to="/boards" class="logo">
-				<h2>📋 Trello Clone</h2>
+				<h2>📋 EasyTask</h2>
 			</router-link>
 
 			<div class="header-actions">

@@ -1,4 +1,5 @@
 <script setup>
+import { ref, watch } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import { MoreFilled, Plus } from '@element-plus/icons-vue';
 import draggable from 'vuedraggable';
@@ -27,6 +28,18 @@ const emit = defineEmits([
 	'edit-card',
 	'move-card'
 ]);
+
+// Локальное состояние для карточек
+const localCards = ref([]);
+
+// Синхронизируем с пропсом
+watch(() => props.list.cards, (newCards) => {
+	if (newCards && Array.isArray(newCards)) {
+		localCards.value = [...newCards];
+	} else {
+		localCards.value = [];
+	}
+}, { immediate: true, deep: true });
 
 const handleListAction = async (command, listId) => {
 	if (command === 'add-card') {
@@ -67,62 +80,38 @@ const handleListAction = async (command, listId) => {
 	}
 };
 
-const handleCardChange = (evt) => {
-	console.log('handleCardChange вызван', evt, props.list._id);
+const handleCardDragEnd = (evt) => {
+	if (!props.onCardDragEnd || !evt) return;
 	
-	if (!props.onCardDragEnd) return;
+	// Устанавливаем data-list-id на элементы from и to для правильной идентификации списков
+	if (evt.from) {
+		evt.from.setAttribute('data-list-id', props.list._id);
+	}
 	
-	// Событие change срабатывает при любом изменении
-	// evt.added - когда карточка добавлена (перемещена из другого списка)
-	// evt.moved - когда карточка перемещена внутри списка
-	// evt.removed - когда карточка удалена (перемещена в другой список)
-	
-	// Обрабатываем только added и moved, removed обрабатывается в другом компоненте через added
-	if (evt.added) {
-		// Карточка была добавлена в этот список (перемещена из другого)
-		const card = evt.added.element;
-		const newIndex = evt.added.newIndex;
-		if (card && card._id) {
-			// Находим draggable элемент для этого списка
-			const draggableEl = document.querySelector(`.cards-draggable[data-list-id="${props.list._id}"]`);
-			const fakeEvt = {
-				item: { _underlying_vm_: card },
-				newIndex,
-				oldIndex: null,
-				from: null,
-				to: draggableEl
-			};
-			// Устанавливаем data-list-id на to элемент
-			if (fakeEvt.to) {
-				fakeEvt.to.setAttribute('data-list-id', props.list._id);
+	// Для to элемента определяем список
+	if (evt.to) {
+		// Сначала проверяем, есть ли уже data-list-id на самом элементе
+		let toListId = evt.to.dataset?.listId || evt.to.getAttribute?.('data-list-id');
+		
+		// Если не нашли, ищем в родительских элементах (cards-container имеет data-list-id)
+		if (!toListId && evt.to.parentElement) {
+			let parent = evt.to.parentElement;
+			let depth = 0;
+			while (parent && !toListId && depth < 5) {
+				toListId = parent.dataset?.listId || parent.getAttribute?.('data-list-id');
+				parent = parent.parentElement;
+				depth++;
 			}
-			props.onCardDragEnd(fakeEvt);
 		}
-	} else if (evt.moved) {
-		// Карточка была перемещена внутри списка
-		const card = evt.moved.element;
-		const newIndex = evt.moved.newIndex;
-		const oldIndex = evt.moved.oldIndex;
-		if (card && card._id) {
-			// Находим draggable элемент для этого списка
-			const draggableEl = document.querySelector(`.cards-draggable[data-list-id="${props.list._id}"]`);
-			const fakeEvt = {
-				item: { _underlying_vm_: card },
-				newIndex,
-				oldIndex,
-				from: draggableEl,
-				to: draggableEl
-			};
-			// Устанавливаем data-list-id
-			if (fakeEvt.from) {
-				fakeEvt.from.setAttribute('data-list-id', props.list._id);
-			}
-			if (fakeEvt.to) {
-				fakeEvt.to.setAttribute('data-list-id', props.list._id);
-			}
-			props.onCardDragEnd(fakeEvt);
+		
+		// Если все еще не нашли, используем текущий список (карточка переместилась внутри списка)
+		if (!toListId) {
+			toListId = props.list._id;
+			evt.to.setAttribute('data-list-id', toListId);
 		}
 	}
+	
+	props.onCardDragEnd(evt);
 };
 </script>
 
@@ -145,19 +134,18 @@ const handleCardChange = (evt) => {
 		</div>
 
 		<div class="cards-container" :data-list-id="list._id">
-			<div v-if="!list.cards || list.cards.length === 0" class="empty-cards">
+			<div v-if="!localCards || localCards.length === 0" class="empty-cards">
 				<p>Нет карточек</p>
 			</div>
 			<draggable
 				v-else
-				v-model="list.cards"
+				v-model="localCards"
 				group="cards"
-				@change="handleCardChange"
+				@end="handleCardDragEnd"
 				item-key="_id"
 				:animation="200"
 				class="cards-draggable"
 				:data-list-id="list._id"
-				:force-fallback="false"
 			>
 				<template #item="{ element: card }">
 					<CardItem

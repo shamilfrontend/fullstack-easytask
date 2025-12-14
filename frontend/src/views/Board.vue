@@ -199,56 +199,38 @@ const onListDragEnd = async () => {
 
 // Handle card drag end
 const onCardDragEnd = async (evt) => {
-	if (!evt) {
-		console.log('onCardDragEnd: нет события');
-		return;
-	}
-
-	// console.log('onCardDragEnd вызван', evt);
+	if (!evt) return;
 
 	const newIndex = evt.newIndex;
 	const oldIndex = evt.oldIndex;
 	
 	// Если позиция не изменилась и список тот же, ничего не делаем
-	console.log('newIndex: ', newIndex);
-	console.log('oldIndex: ', oldIndex);
-	console.log('evt.from: ', evt.from);
-	console.log('evt.to: ', evt.to);
 	if (newIndex === oldIndex && evt.from === evt.to) {
-		console.log('Позиция не изменилась');
 		return;
 	}
 
 	// Ждем обновления v-model после перемещения
 	await nextTick();
 
-	// Получаем ID карточки из события - пробуем разные способы
+	// Получаем ID карточки из события
 	let cardId = null;
 	
-	// Способ 1: из _underlying_vm_ (Vue 3) - самый надежный
 	if (evt.item?._underlying_vm_?._id) {
 		cardId = evt.item._underlying_vm_._id;
-		console.log('Получен cardId из _underlying_vm_:', cardId);
-	}
-	// Способ 2: из element
-	else if (evt.item?.element?._id) {
+	} else if (evt.item?.element?._id) {
 		cardId = evt.item.element._id;
-		console.log('Получен cardId из element:', cardId);
-	}
-	// Способ 3: из нового списка по индексу (vuedraggable уже обновил v-model)
-	else if (newIndex !== undefined && newIndex !== null && evt.to) {
+	} else if (newIndex !== undefined && newIndex !== null && evt.to) {
+		// Пытаемся получить из обновленного массива
 		const toListId = evt.to?.dataset?.listId || evt.to?.getAttribute?.('data-list-id');
 		if (toListId) {
 			const toList = localLists.value.find(l => l._id === toListId);
 			if (toList && toList.cards && toList.cards[newIndex]) {
 				cardId = toList.cards[newIndex]._id;
-				console.log('Получен cardId из нового списка по индексу:', cardId);
 			}
 		}
 	}
 
-	if (!cardId) {
-		console.error('Не удалось получить cardId из события', evt);
+	if (!cardId || newIndex === undefined || newIndex === null) {
 		await fetchBoard();
 		return;
 	}
@@ -262,15 +244,14 @@ const onCardDragEnd = async (evt) => {
 	);
 	if (cardInLists) {
 		newListId = cardInLists._id;
-		console.log('Найден newListId через поиск карточки:', newListId);
 	}
 	
-	// Способ 2: из data-атрибута целевого элемента (если не нашли через поиск)
+	// Способ 2: из data-атрибута целевого элемента
 	if (!newListId && evt.to) {
-		newListId = evt.to.dataset?.listId || evt.to.getAttribute?.('data-list-id');
+		newListId = evt.to.dataset?.listId || evt.to?.getAttribute?.('data-list-id');
 		
 		// Если не нашли, ищем в родительских элементах
-		if (!newListId) {
+		if (!newListId && evt.to.parentElement) {
 			let parent = evt.to.parentElement;
 			let depth = 0;
 			while (parent && !newListId && depth < 10) {
@@ -279,26 +260,17 @@ const onCardDragEnd = async (evt) => {
 				depth++;
 			}
 		}
-		
-		if (newListId) {
-			console.log('Найден newListId через DOM:', newListId);
-		}
 	}
 	
 	if (!newListId) {
-		console.error('Не удалось определить newListId', evt);
 		await fetchBoard();
 		return;
 	}
 
-	console.log('Перемещение карточки:', { cardId, newListId, newIndex });
-
 	const result = await cardComposable.move(cardId, newListId, newIndex);
 	if (result.success) {
-		console.log('Карточка успешно перемещена');
 		await fetchBoard();
 	} else {
-		console.error('Ошибка перемещения карточки:', result);
 		await fetchBoard();
 	}
 };

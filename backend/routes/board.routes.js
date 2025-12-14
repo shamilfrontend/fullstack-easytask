@@ -1,4 +1,5 @@
 import express from 'express';
+
 import {protect} from '../middleware/auth.middleware.js';
 import Board from '../models/Board.model.js';
 import List from '../models/List.model.js';

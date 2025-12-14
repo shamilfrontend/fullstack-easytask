@@ -1,15 +1,23 @@
 <script setup>
-import {ref, computed, onMounted, onUnmounted, nextTick, watch} from 'vue';
-import {useRoute, useRouter} from 'vue-router';
-import {ElMessage} from 'element-plus';
-import {Plus} from '@element-plus/icons-vue';
+import {
+	ref,
+	computed,
+	onMounted,
+	onUnmounted,
+	nextTick,
+	watch
+} from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { ElMessage } from 'element-plus';
+import { Plus } from '@element-plus/icons-vue';
 import draggable from 'vuedraggable';
+
 import api from '../services/api';
-import {initSocket, getSocket} from '../services/socket';
-import {useBoard} from '../composables/useBoard';
-import {useCard} from '../composables/useCard';
-import {useDragAndDrop} from '../composables/useDragAndDrop';
-import {getNextListPosition} from '../utils/boardHelpers';
+import { initSocket, getSocket } from '../services/socket';
+import { useBoard } from '../composables/useBoard';
+import { useCard } from '../composables/useCard';
+import { useDragAndDrop } from '../composables/useDragAndDrop';
+import { getNextListPosition } from '../utils/boardHelpers';
 import AppHeader from '../components/AppHeader.vue';
 import ListCard from '../components/ListCard.vue';
 import CardDetail from '../components/CardDetail.vue';
@@ -20,7 +28,6 @@ import BoardToolbar from '../components/BoardToolbar.vue';
 const route = useRoute();
 const router = useRouter();
 
-// Composables
 const boardComposable = useBoard(route.params.id);
 const cardComposable = useCard();
 const dragDrop = useDragAndDrop();
@@ -38,7 +45,6 @@ const listInputRef = ref(null);
 const cardInputRef = ref(null);
 const localLists = ref([]);
 
-// Computed
 const board = computed(() => boardComposable.board.value);
 const lists = computed({
 	get: () => {
@@ -66,11 +72,15 @@ watch(() => boardComposable.lists.value, (newLists) => {
 			cards: Array.isArray(list.cards) ? [...list.cards] : []
 		}));
 	}
-}, {deep: true, immediate: true});
+}, {
+	deep: true,
+	immediate: true
+});
 
 // Fetch board
 const fetchBoard = async () => {
 	const result = await boardComposable.fetch();
+
 	if (!result.success) {
 		if (result.error && (result.error.includes('403') || result.error.includes('404'))) {
 			setTimeout(() => {
@@ -90,7 +100,10 @@ const createList = async () => {
 	if (!board.value) return;
 
 	try {
-		const position = getNextListPosition(localLists.value.length > 0 ? localLists.value : boardComposable.lists.value);
+		const position = getNextListPosition(
+			localLists.value.length > 0 ? localLists.value : boardComposable.lists.value
+		);
+
 		await api.post('/lists', {
 			title: newListTitle.value,
 			boardId: board.value._id,
@@ -253,6 +266,7 @@ onMounted(async () => {
 
 onUnmounted(() => {
 	const socket = getSocket();
+
 	if (socket && board.value) {
 		socket.emit('leave-board', board.value._id);
 		socket.off('card-created');
@@ -268,7 +282,7 @@ onUnmounted(() => {
 
 <template>
 	<div class="board-page" :style="{ background: board?.background }">
-		<AppHeader/>
+		<AppHeader />
 
 		<div class="board-container" v-loading="loading">
 			<BoardToolbar
@@ -283,10 +297,10 @@ onUnmounted(() => {
 				<draggable
 					v-model="localLists"
 					group="lists"
-					@end="onListDragEnd"
 					item-key="_id"
 					handle=".list-header"
 					class="lists-draggable"
+					@end="onListDragEnd"
 				>
 					<template #item="{ element: list }">
 						<ListCard
@@ -303,7 +317,7 @@ onUnmounted(() => {
 
 				<div class="add-list-btn" @click="showAddList">
 					<el-icon>
-						<Plus/>
+						<Plus />
 					</el-icon>
 					Добавить список
 				</div>

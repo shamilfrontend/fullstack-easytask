@@ -1,8 +1,8 @@
 <script setup>
-import {ref, computed, onMounted} from 'vue';
-import {ElMessage} from 'element-plus';
-import {useAuthStore} from '../stores/auth';
-import api from '../services/api';
+import { ref, computed, onMounted } from 'vue';
+import { ElMessage } from 'element-plus';
+
+import { useAuthStore } from '../stores/auth';
 import AppHeader from '../components/AppHeader.vue';
 
 const authStore = useAuthStore();
@@ -72,7 +72,7 @@ const handleAvatarSuccess = () => {
 					</el-upload>
 				</div>
 
-				<el-form :model="form" label-width="150px" style="max-width: 600px;">
+				<el-form :model="form" label-position="top" style="max-width: 600px;">
 					<el-form-item label="Имя">
 						<el-input v-model="form.name"/>
 					</el-form-item>
@@ -102,7 +102,7 @@ const handleAvatarSuccess = () => {
 }
 
 .profile-container {
-	max-width: 800px;
+	max-width: 1200px;
 	margin: 0 auto;
 	padding: $spacing-lg;
 }
@@ -118,4 +118,3 @@ const handleAvatarSuccess = () => {
 	margin-bottom: $spacing-xl;
 }
 </style>
-

@@ -1,7 +1,7 @@
 <script setup>
-import {computed} from 'vue';
-import {Clock, Paperclip, List, ChatDotRound, User} from '@element-plus/icons-vue';
-import {isDatePast, isDateToday} from '../utils/dateHelpers';
+import { computed } from 'vue';
+import { Clock, Paperclip, List, ChatDotRound } from '@element-plus/icons-vue';
+import { isDatePast, isDateToday } from '../utils/dateHelpers';
 
 const props = defineProps({
 	card: {
@@ -46,7 +46,6 @@ const priorityLabel = computed(() => {
 const getLabelColor = (labelId) => {
 	if (!props.board || !props.board.labels) return '#ccc';
 	const label = props.board.labels.find(l => {
-		// Handle both object IDs and string IDs
 		const labelIdStr = typeof labelId === 'object' ? labelId.toString() : labelId;
 		const lIdStr = typeof l._id === 'object' ? l._id.toString() : l._id;
 		return lIdStr === labelIdStr;

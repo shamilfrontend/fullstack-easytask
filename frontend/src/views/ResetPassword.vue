@@ -1,8 +1,9 @@
 <script setup>
-import {ref, reactive} from 'vue';
-import {useRoute, useRouter} from 'vue-router';
+import { ElMessage } from 'element-plus';
+import { ref, reactive } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+
 import api from '../services/api';
-import {ElMessage} from 'element-plus';
 
 const route = useRoute();
 const router = useRouter();
@@ -134,4 +135,3 @@ const handleSubmit = async () => {
 	font-weight: 600;
 }
 </style>
-

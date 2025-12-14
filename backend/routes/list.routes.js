@@ -1,4 +1,5 @@
 import express from 'express';
+
 import {protect} from '../middleware/auth.middleware.js';
 import List from '../models/List.model.js';
 import Board from '../models/Board.model.js';
@@ -10,22 +11,32 @@ const router = express.Router();
 // Helper function to check board access
 const checkBoardAccess = async (boardId, userId) => {
     const board = await Board.findById(boardId);
-    if (!board) return {hasAccess: false};
+    if (!board) return {
+        hasAccess: false
+    };
 
     if (board.owner.toString() === userId.toString()) {
-        return {hasAccess: true};
+        return {
+            hasAccess: true
+        };
     }
 
     const member = board.members.find(m => m.user.toString() === userId.toString());
     if (member) {
-        return {hasAccess: true};
+        return {
+            hasAccess: true
+        };
     }
 
     if (board.visibility === 'public') {
-        return {hasAccess: true};
+        return {
+            hasAccess: true
+        };
     }
 
-    return {hasAccess: false};
+    return {
+        hasAccess: false
+    };
 };
 
 // @route   POST /api/lists
@@ -37,7 +48,9 @@ router.post('/', protect, async (req, res) => {
 
         const {hasAccess} = await checkBoardAccess(boardId, req.user._id);
         if (!hasAccess) {
-            return res.status(403).json({message: 'Access denied'});
+            return res.status(403).json({
+                message: 'Access denied'
+            });
         }
 
         const list = await List.create({
@@ -68,7 +81,9 @@ router.post('/', protect, async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({message: 'Server error'});
+        res.status(500).json({
+            message: 'Server error'
+        });
     }
 });
 
@@ -81,12 +96,16 @@ router.put('/:id', protect, async (req, res) => {
         const list = await List.findById(req.params.id);
 
         if (!list) {
-            return res.status(404).json({message: 'List not found'});
+            return res.status(404).json({
+                message: 'List not found'
+            });
         }
 
         const {hasAccess} = await checkBoardAccess(list.board, req.user._id);
         if (!hasAccess) {
-            return res.status(403).json({message: 'Access denied'});
+            return res.status(403).json({
+                message: 'Access denied'
+            });
         }
 
         if (title !== undefined) list.title = title;
@@ -108,7 +127,9 @@ router.put('/:id', protect, async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({message: 'Server error'});
+        res.status(500).json({
+            message: 'Server error'
+        });
     }
 });
 
@@ -120,12 +141,16 @@ router.delete('/:id', protect, async (req, res) => {
         const list = await List.findById(req.params.id);
 
         if (!list) {
-            return res.status(404).json({message: 'List not found'});
+            return res.status(404).json({
+                message: 'List not found'
+            });
         }
 
         const {hasAccess} = await checkBoardAccess(list.board, req.user._id);
         if (!hasAccess) {
-            return res.status(403).json({message: 'Access denied'});
+            return res.status(403).json({
+                message: 'Access denied'
+            });
         }
 
         // Archive all cards in the list
@@ -159,9 +184,10 @@ router.delete('/:id', protect, async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({message: 'Server error'});
+        res.status(500).json({
+            message: 'Server error'
+        });
     }
 });
 
 export default router;
-

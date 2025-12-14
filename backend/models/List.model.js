@@ -24,4 +24,3 @@ const listSchema = new mongoose.Schema({
 });
 
 export default mongoose.model('List', listSchema);
-

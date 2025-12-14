@@ -96,4 +96,3 @@ const cardSchema = new mongoose.Schema({
 });
 
 export default mongoose.model('Card', cardSchema);
-

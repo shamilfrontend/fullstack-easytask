@@ -1,8 +1,9 @@
 <script setup>
-import {ref, reactive} from 'vue';
-import {useRouter} from 'vue-router';
+import { ElMessage } from 'element-plus';
+import { ref, reactive } from 'vue';
+import { useRouter } from 'vue-router';
+
 import api from '../services/api';
-import {ElMessage} from 'element-plus';
 
 const router = useRouter();
 const formRef = ref(null);
@@ -125,4 +126,3 @@ const handleSubmit = async () => {
 	}
 }
 </style>
-

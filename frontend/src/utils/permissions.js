@@ -18,17 +18,14 @@ export const isBoardOwner = (board, userId) => {
  * @returns {boolean}
  */
 export const isBoardAdmin = (board, userId) => {
-    console.log('userId: ', userId);
 	if (!board || !userId) return false;
 	if (isBoardOwner(board, userId)) return true;
 
-    console.log('board.members: ', board.members);
 	const member = board.members?.find(m => {
 		const memberId = m.user?._id || m.user;
 		return memberId?.toString() === userId.toString();
 	});
 
-    console.log('member: ', member);
 	return member?.role === 'admin';
 };
 
@@ -55,8 +52,7 @@ export const isBoardMember = (board, userId) => {
  * @returns {boolean}
  */
 export const canEditBoard = (board, userId) => {
-    console.log('isBoardAdmin', isBoardAdmin(board, userId))
-	return isBoardOwner(board, userId) || isBoardAdmin(board, userId);
+    return isBoardOwner(board, userId) || isBoardAdmin(board, userId);
 };
 
 /**
@@ -97,4 +93,3 @@ export const getBoardRole = (board, userId) => {
 	
 	return member?.role || (board.visibility === 'public' ? 'viewer' : null);
 };
-

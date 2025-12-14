@@ -1,5 +1,5 @@
-import {defineStore} from 'pinia';
-import {ref, computed} from 'vue';
+import { defineStore } from 'pinia';
+import { ref, computed } from 'vue';
 
 import api from '../services/api';
 import { ElMessage } from 'element-plus';
@@ -223,4 +223,3 @@ export const useBoardsStore = defineStore('boards', () => {
         clearCurrentBoard
     };
 });
-

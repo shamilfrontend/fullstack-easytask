@@ -1,11 +1,12 @@
 <script setup>
-import {ref, computed, watch, nextTick} from 'vue';
-import {Plus, Document, Edit, Delete, Close} from '@element-plus/icons-vue';
-import {ElMessage, ElMessageBox} from 'element-plus';
+import { ref, computed, watch, nextTick } from 'vue';
+import { Plus, Document, Edit, Delete, Close } from '@element-plus/icons-vue';
+import { ElMessage, ElMessageBox } from 'element-plus';
+
 import api from '../services/api';
-import {formatRelativeDate} from '../utils/dateHelpers';
-import {useAuthStore} from '../stores/auth';
-import {useCard} from '../composables/useCard';
+import { formatRelativeDate } from '../utils/dateHelpers';
+import { useAuthStore } from '../stores/auth';
+import { useCard } from '../composables/useCard';
 
 const props = defineProps({
 	card: {
@@ -159,8 +160,7 @@ const addChecklist = async (event) => {
 	}
 };
 
-const saveChecklist = async (checklistId) => {
-	// This would need to be implemented properly
+const saveChecklist = async () => {
 	emit('update');
 };
 
@@ -838,6 +838,3 @@ watch(() => visible.value, (val) => {
 	font-style: italic;
 }
 </style>
-
-
-

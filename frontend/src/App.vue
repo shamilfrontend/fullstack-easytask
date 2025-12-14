@@ -1,7 +1,8 @@
 <script setup>
-import {onMounted, computed} from 'vue';
-import {useAuthStore} from './stores/auth';
-import {useUIStore} from './stores/ui';
+import { onMounted, computed } from 'vue';
+
+import { useAuthStore } from './stores/auth';
+import { useUIStore } from './stores/ui';
 
 const authStore = useAuthStore();
 const uiStore = useUIStore();
@@ -17,7 +18,7 @@ onMounted(() => {
 
 <template>
 	<div id="app" :class="themeClass">
-		<router-view/>
+		<router-view />
 	</div>
 </template>
 
@@ -37,4 +38,3 @@ onMounted(() => {
 	color: #b6c2cf;
 }
 </style>
-

@@ -1,5 +1,5 @@
-import {createApp} from 'vue';
-import {createPinia} from 'pinia';
+import { createApp } from 'vue';
+import { createPinia } from 'pinia';
 import ElementPlus from 'element-plus';
 import 'element-plus/dist/index.css';
 import * as ElementPlusIconsVue from '@element-plus/icons-vue';
@@ -18,6 +18,8 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 
 app.use(pinia);
 app.use(router);
-app.use(ElementPlus, {locale: ru});
+app.use(ElementPlus, {
+    locale: ru
+});
 
 app.mount('#app');

@@ -1,15 +1,16 @@
-import {ref} from 'vue';
+import { ref } from 'vue';
+import { ElMessage } from 'element-plus';
+
 import api from '../services/api';
-import {ElMessage} from 'element-plus';
 import * as boardHelpers from '../utils/boardHelpers';
 
-/**
- * Composable для работы с drag-and-drop
- */
 export const useDragAndDrop = () => {
 	const isDragging = ref(false);
 
-	// Handle list drag end
+    const onDragStart = () => {
+        isDragging.value = true;
+    };
+
 	const onListDragEnd = async (lists) => {
 		isDragging.value = false;
 		
@@ -32,7 +33,6 @@ export const useDragAndDrop = () => {
 		}
 	};
 
-	// Handle card drag end
 	const onCardDragEnd = async (evt, newListId, lists) => {
 		isDragging.value = false;
 		
@@ -52,8 +52,7 @@ export const useDragAndDrop = () => {
 		}
 
 		// Calculate new position
-		const newIndex = evt.newIndex;
-		const position = newIndex;
+        const position = evt.newIndex;
 
 		try {
 			// Update card position
@@ -98,11 +97,6 @@ export const useDragAndDrop = () => {
 		}
 	};
 
-	// Handle drag start
-	const onDragStart = () => {
-		isDragging.value = true;
-	};
-
 	return {
 		isDragging,
 		onListDragEnd,
@@ -110,4 +104,3 @@ export const useDragAndDrop = () => {
 		onDragStart
 	};
 };
-

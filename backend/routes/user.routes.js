@@ -1,10 +1,11 @@
 import express from 'express';
-import {protect} from '../middleware/auth.middleware.js';
-import User from '../models/User.model.js';
 import multer from 'multer';
 import path from 'path';
 import {fileURLToPath} from 'url';
 import fs from 'fs';
+
+import { protect } from '../middleware/auth.middleware.js';
+import User from '../models/User.model.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -36,8 +37,6 @@ const upload = multer({
         const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
         const mimetype = allowedTypes.test(file.mimetype);
 
-        console.log('extname: ', extname);
-        console.log('mimetype: ', mimetype);
         if (extname && mimetype) {
             return cb(null, true);
         } else {
@@ -104,10 +103,11 @@ router.put('/profile', protect, async (req, res) => {
 // @desc    Upload user avatar
 // @access  Private
 router.post('/avatar', protect, upload.single('avatar'), async (req, res) => {
-    console.log('req.file: ', req.file);
     try {
         if (!req.file) {
-            return res.status(400).json({message: 'No file uploaded'});
+            return res.status(400).json({
+                message: 'No file uploaded'
+            });
         }
 
         const user = await User.findById(req.user._id);
@@ -126,7 +126,9 @@ router.post('/avatar', protect, upload.single('avatar'), async (req, res) => {
         });
     } catch (error) {
         console.error('error:', error);
-        res.status(500).json({message: 'Server error'});
+        res.status(500).json({
+            message: 'Server error'
+        });
     }
 });
 
@@ -154,9 +156,10 @@ router.get('/search', protect, async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({message: 'Server error'});
+        res.status(500).json({
+            message: 'Server error'
+        });
     }
 });
 
 export default router;
-

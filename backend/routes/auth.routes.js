@@ -1,8 +1,8 @@
 import express from 'express';
-import {body, validationResult} from 'express-validator';
+import { body, validationResult } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.model.js';
-import {protect} from '../middleware/auth.middleware.js';
+import { protect } from '../middleware/auth.middleware.js';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 
@@ -253,4 +253,3 @@ router.put('/reset-password/:token', [
 });
 
 export default router;
-

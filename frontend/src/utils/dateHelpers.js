@@ -1,5 +1,12 @@
-import {format, formatDistanceToNow, isPast, isToday, isTomorrow, parseISO} from 'date-fns';
-import {ru} from 'date-fns/locale';
+import {
+    format,
+    formatDistanceToNow,
+    isPast,
+    isToday,
+    isTomorrow,
+    parseISO
+} from 'date-fns';
+import { ru } from 'date-fns/locale';
 
 /**
  * Форматирует дату в читаемый формат
@@ -99,4 +106,3 @@ export const getDueDateStatus = (dueDate) => {
 
 	return {status: 'upcoming', label: formatDate(dueDate, 'dd.MM.yyyy')};
 };
-

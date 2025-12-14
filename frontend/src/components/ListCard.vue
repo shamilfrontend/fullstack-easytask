@@ -1,8 +1,8 @@
 <script setup>
-import {ref} from 'vue';
-import {ElMessageBox} from 'element-plus';
-import {MoreFilled, Plus} from '@element-plus/icons-vue';
+import { ElMessageBox } from 'element-plus';
+import { MoreFilled, Plus } from '@element-plus/icons-vue';
 import draggable from 'vuedraggable';
+
 import CardItem from './CardItem.vue';
 
 const props = defineProps({
@@ -38,11 +38,11 @@ const handleListAction = async (command, listId) => {
 					inputValue: props.list.title
 				}
 			);
-			
+
 			if (newTitle && newTitle.trim() !== props.list.title) {
 				emit('update-list', listId, {title: newTitle.trim()});
 			}
-		} catch (error) {
+		} catch {
 			// User cancelled
 		}
 	} else if (command === 'delete') {
@@ -57,7 +57,7 @@ const handleListAction = async (command, listId) => {
 				}
 			);
 			emit('delete-list', listId);
-		} catch (error) {
+		} catch {
 			// User cancelled
 		}
 	}
@@ -66,10 +66,10 @@ const handleListAction = async (command, listId) => {
 const onCardDragEnd = (evt) => {
 	const card = evt.item?.element;
 	if (!card || !card._id) return;
-	
+
 	const newIndex = evt.newIndex;
 	const oldIndex = evt.oldIndex;
-	
+
 	if (newIndex !== oldIndex) {
 		emit('move-card', {
 			cardId: card._id,
@@ -125,7 +125,7 @@ const onCardDragEnd = (evt) => {
 
 		<div class="add-card-btn" @click="$emit('add-card', list._id)">
 			<el-icon>
-				<Plus/>
+				<Plus />
 			</el-icon>
 			Добавить карточку
 		</div>
@@ -206,4 +206,3 @@ const onCardDragEnd = (evt) => {
 	}
 }
 </style>
-

@@ -1,6 +1,7 @@
-import {ref, computed} from 'vue';
-import {useBoardsStore} from '../stores/boards';
-import {useAuthStore} from '../stores/auth';
+import { computed } from 'vue';
+
+import { useBoardsStore } from '../stores/boards';
+import { useAuthStore } from '../stores/auth';
 import * as permissions from '../utils/permissions';
 import * as boardHelpers from '../utils/boardHelpers';
 
@@ -97,4 +98,3 @@ export const useBoard = (boardId) => {
 		removeMember
 	};
 };
-

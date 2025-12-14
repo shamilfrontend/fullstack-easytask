@@ -1,4 +1,5 @@
 import express from 'express';
+
 import {protect} from '../middleware/auth.middleware.js';
 import Comment from '../models/Comment.model.js';
 import Card from '../models/Card.model.js';
@@ -11,22 +12,33 @@ const router = express.Router();
 // Helper function to check board access
 const checkBoardAccess = async (boardId, userId) => {
     const board = await Board.findById(boardId);
-    if (!board) return {hasAccess: false};
+
+    if (!board) return {
+        hasAccess: false
+    };
 
     if (board.owner.toString() === userId.toString()) {
-        return {hasAccess: true};
+        return {
+            hasAccess: true
+        };
     }
 
     const member = board.members.find(m => m.user.toString() === userId.toString());
     if (member) {
-        return {hasAccess: true};
+        return {
+            hasAccess: true
+        };
     }
 
     if (board.visibility === 'public') {
-        return {hasAccess: true};
+        return {
+            hasAccess: true
+        };
     }
 
-    return {hasAccess: false};
+    return {
+        hasAccess: false
+    };
 };
 
 // @route   GET /api/comments/card/:cardId
@@ -36,15 +48,21 @@ router.get('/card/:cardId', protect, async (req, res) => {
     try {
         const card = await Card.findById(req.params.cardId);
         if (!card) {
-            return res.status(404).json({message: 'Card not found'});
+            return res.status(404).json({
+                message: 'Card not found'
+            });
         }
 
         const {hasAccess} = await checkBoardAccess(card.board, req.user._id);
         if (!hasAccess) {
-            return res.status(403).json({message: 'Access denied'});
+            return res.status(403).json({
+                message: 'Access denied'
+            });
         }
 
-        const comments = await Comment.find({card: req.params.cardId})
+        const comments = await Comment.find({
+            card: req.params.cardId
+        })
             .populate('author', 'name email avatar')
             .sort({createdAt: 1});
 
@@ -54,7 +72,9 @@ router.get('/card/:cardId', protect, async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({message: 'Server error'});
+        res.status(500).json({
+            message: 'Server error'
+        });
     }
 });
 
@@ -67,12 +87,16 @@ router.post('/', protect, async (req, res) => {
 
         const card = await Card.findById(cardId);
         if (!card) {
-            return res.status(404).json({message: 'Card not found'});
+            return res.status(404).json({
+                message: 'Card not found'
+            });
         }
 
         const {hasAccess} = await checkBoardAccess(card.board, req.user._id);
         if (!hasAccess) {
-            return res.status(403).json({message: 'Access denied'});
+            return res.status(403).json({
+                message: 'Access denied'
+            });
         }
 
         const comment = await Comment.create({
@@ -125,7 +149,9 @@ router.post('/', protect, async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({message: 'Server error'});
+        res.status(500).json({
+            message: 'Server error'
+        });
     }
 });
 
@@ -138,11 +164,15 @@ router.put('/:id', protect, async (req, res) => {
         const comment = await Comment.findById(req.params.id);
 
         if (!comment) {
-            return res.status(404).json({message: 'Comment not found'});
+            return res.status(404).json({
+                message: 'Comment not found'
+            });
         }
 
         if (comment.author.toString() !== req.user._id.toString()) {
-            return res.status(403).json({message: 'Not authorized'});
+            return res.status(403).json({
+                message: 'Not authorized'
+            });
         }
 
         comment.text = text;
@@ -159,7 +189,9 @@ router.put('/:id', protect, async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({message: 'Server error'});
+        res.status(500).json({
+            message: 'Server error'
+        });
     }
 });
 
@@ -171,14 +203,18 @@ router.delete('/:id', protect, async (req, res) => {
         const comment = await Comment.findById(req.params.id);
 
         if (!comment) {
-            return res.status(404).json({message: 'Comment not found'});
+            return res.status(404).json({
+                message: 'Comment not found'
+            });
         }
 
         const card = await Card.findById(comment.card);
         const {hasAccess} = await checkBoardAccess(card.board, req.user._id);
 
         if (comment.author.toString() !== req.user._id.toString() && !hasAccess) {
-            return res.status(403).json({message: 'Not authorized'});
+            return res.status(403).json({
+                message: 'Not authorized'
+            });
         }
 
         await comment.deleteOne();
@@ -189,9 +225,10 @@ router.delete('/:id', protect, async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({message: 'Server error'});
+        res.status(500).json({
+            message: 'Server error'
+        });
     }
 });
 
 export default router;
-

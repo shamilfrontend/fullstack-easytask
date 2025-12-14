@@ -148,4 +148,3 @@ export const getCardChecklistStats = (card) => {
 	
 	return {completed, total};
 };
-

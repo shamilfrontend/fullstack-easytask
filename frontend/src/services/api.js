@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import {useAuthStore} from '../stores/auth';
+import { useAuthStore } from '../stores/auth';
 import router from '../router';
 
 const api = axios.create({
@@ -38,4 +38,3 @@ api.interceptors.response.use(
 );
 
 export default api;
-

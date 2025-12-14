@@ -1,12 +1,12 @@
 <script setup>
-import {formatDistanceToNow} from 'date-fns';
-import {ru} from 'date-fns/locale';
-import {Bell, User, Setting, SwitchButton, ArrowDown, Delete} from '@element-plus/icons-vue';
-import {ref, computed, onMounted} from 'vue';
-import {useRouter} from 'vue-router';
-import {ElMessage, ElMessageBox} from 'element-plus';
+import { formatDistanceToNow } from 'date-fns';
+import { ru} from 'date-fns/locale';
+import { Bell, User, SwitchButton, ArrowDown, Delete } from '@element-plus/icons-vue';
+import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { ElMessage, ElMessageBox } from 'element-plus';
 
-import {useAuthStore} from '../stores/auth';
+import { useAuthStore } from '../stores/auth';
 import api from '../services/api';
 
 const router = useRouter();
@@ -278,4 +278,3 @@ onMounted(() => {
 	}
 }
 </style>
-

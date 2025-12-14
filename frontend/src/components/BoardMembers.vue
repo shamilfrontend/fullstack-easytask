@@ -1,7 +1,8 @@
 <script setup>
-import {ref} from 'vue';
-import {MoreFilled} from '@element-plus/icons-vue';
-import {ElMessage, ElMessageBox} from 'element-plus';
+import { ref } from 'vue';
+import { MoreFilled } from '@element-plus/icons-vue';
+import { ElMessage, ElMessageBox } from 'element-plus';
+
 import api from '../services/api';
 
 const props = defineProps({
@@ -196,4 +197,3 @@ const getRoleName = (role) => {
 	}
 }
 </style>
-

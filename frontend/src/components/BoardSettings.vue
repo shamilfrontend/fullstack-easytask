@@ -1,6 +1,7 @@
 <script setup>
-import {ref, watch} from 'vue';
-import {ElMessage} from 'element-plus';
+import { ref, watch } from 'vue';
+import { ElMessage } from 'element-plus';
+
 import api from '../services/api';
 
 const props = defineProps({
@@ -77,4 +78,3 @@ const saveSettings = async () => {
 		</template>
 	</el-dialog>
 </template>
-

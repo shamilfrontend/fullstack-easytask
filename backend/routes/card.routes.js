@@ -1,14 +1,15 @@
 import express from 'express';
+import multer from 'multer';
+import path from 'path';
+import {fileURLToPath} from 'url';
+import fs from 'fs';
+
 import {protect} from '../middleware/auth.middleware.js';
 import Card from '../models/Card.model.js';
 import List from '../models/List.model.js';
 import Board from '../models/Board.model.js';
 import Activity from '../models/Activity.model.js';
 import Notification from '../models/Notification.model.js';
-import multer from 'multer';
-import path from 'path';
-import {fileURLToPath} from 'url';
-import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -535,4 +536,3 @@ router.delete('/:id', protect, async (req, res) => {
 });
 
 export default router;
-

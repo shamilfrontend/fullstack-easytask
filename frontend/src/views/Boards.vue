@@ -216,12 +216,12 @@ onMounted(() => {
 
 .boards-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+	grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
 	gap: $spacing-md;
 }
 
 .board-card {
-	min-height: 120px;
+	min-height: 160px;
 	border-radius: $border-radius;
 	cursor: pointer;
 	transition: transform $transition-normal, box-shadow $transition-normal;

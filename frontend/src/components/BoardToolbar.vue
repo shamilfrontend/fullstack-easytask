@@ -1,7 +1,7 @@
 <script setup>
-import {Setting, User} from '@element-plus/icons-vue';
+import { Setting, User } from '@element-plus/icons-vue';
 
-const props = defineProps({
+defineProps({
 	board: {
 		type: Object,
 		required: true
@@ -12,7 +12,7 @@ const props = defineProps({
 	}
 });
 
-const emit = defineEmits(['settings', 'members']);
+defineEmits(['settings', 'members']);
 </script>
 
 <template>
@@ -77,4 +77,3 @@ const emit = defineEmits(['settings', 'members']);
 	}
 }
 </style>
-

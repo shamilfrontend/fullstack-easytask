@@ -13,6 +13,10 @@ const props = defineProps({
 	board: {
 		type: Object,
 		required: true
+	},
+	onCardDragEnd: {
+		type: Function,
+		required: true
 	}
 });
 
@@ -63,20 +67,61 @@ const handleListAction = async (command, listId) => {
 	}
 };
 
-const onCardDragEnd = (evt) => {
-	const card = evt.item?.element;
-	if (!card || !card._id) return;
-
-	const newIndex = evt.newIndex;
-	const oldIndex = evt.oldIndex;
-
-	if (newIndex !== oldIndex) {
-		emit('move-card', {
-			cardId: card._id,
-			listId: props.list._id,
-			newIndex,
-			oldIndex
-		});
+const handleCardChange = (evt) => {
+	console.log('handleCardChange вызван', evt, props.list._id);
+	
+	if (!props.onCardDragEnd) return;
+	
+	// Событие change срабатывает при любом изменении
+	// evt.added - когда карточка добавлена (перемещена из другого списка)
+	// evt.moved - когда карточка перемещена внутри списка
+	// evt.removed - когда карточка удалена (перемещена в другой список)
+	
+	// Обрабатываем только added и moved, removed обрабатывается в другом компоненте через added
+	if (evt.added) {
+		// Карточка была добавлена в этот список (перемещена из другого)
+		const card = evt.added.element;
+		const newIndex = evt.added.newIndex;
+		if (card && card._id) {
+			// Находим draggable элемент для этого списка
+			const draggableEl = document.querySelector(`.cards-draggable[data-list-id="${props.list._id}"]`);
+			const fakeEvt = {
+				item: { _underlying_vm_: card },
+				newIndex,
+				oldIndex: null,
+				from: null,
+				to: draggableEl
+			};
+			// Устанавливаем data-list-id на to элемент
+			if (fakeEvt.to) {
+				fakeEvt.to.setAttribute('data-list-id', props.list._id);
+			}
+			props.onCardDragEnd(fakeEvt);
+		}
+	} else if (evt.moved) {
+		// Карточка была перемещена внутри списка
+		const card = evt.moved.element;
+		const newIndex = evt.moved.newIndex;
+		const oldIndex = evt.moved.oldIndex;
+		if (card && card._id) {
+			// Находим draggable элемент для этого списка
+			const draggableEl = document.querySelector(`.cards-draggable[data-list-id="${props.list._id}"]`);
+			const fakeEvt = {
+				item: { _underlying_vm_: card },
+				newIndex,
+				oldIndex,
+				from: draggableEl,
+				to: draggableEl
+			};
+			// Устанавливаем data-list-id
+			if (fakeEvt.from) {
+				fakeEvt.from.setAttribute('data-list-id', props.list._id);
+			}
+			if (fakeEvt.to) {
+				fakeEvt.to.setAttribute('data-list-id', props.list._id);
+			}
+			props.onCardDragEnd(fakeEvt);
+		}
 	}
 };
 </script>
@@ -99,7 +144,7 @@ const onCardDragEnd = (evt) => {
 			</el-dropdown>
 		</div>
 
-		<div class="cards-container">
+		<div class="cards-container" :data-list-id="list._id">
 			<div v-if="!list.cards || list.cards.length === 0" class="empty-cards">
 				<p>Нет карточек</p>
 			</div>
@@ -107,10 +152,12 @@ const onCardDragEnd = (evt) => {
 				v-else
 				v-model="list.cards"
 				group="cards"
-				@end="onCardDragEnd"
+				@change="handleCardChange"
 				item-key="_id"
 				:animation="200"
 				class="cards-draggable"
+				:data-list-id="list._id"
+				:force-fallback="false"
 			>
 				<template #item="{ element: card }">
 					<CardItem

@@ -198,25 +198,107 @@ const onListDragEnd = async () => {
 };
 
 // Handle card drag end
-const onCardDragEnd = async (evt, listId) => {
-	if (!evt) return;
+const onCardDragEnd = async (evt) => {
+	if (!evt) {
+		console.log('onCardDragEnd: нет события');
+		return;
+	}
 
-	const card = evt.item?.element;
-	if (!card || !card._id) {
+	// console.log('onCardDragEnd вызван', evt);
+
+	const newIndex = evt.newIndex;
+	const oldIndex = evt.oldIndex;
+	
+	// Если позиция не изменилась и список тот же, ничего не делаем
+	console.log('newIndex: ', newIndex);
+	console.log('oldIndex: ', oldIndex);
+	console.log('evt.from: ', evt.from);
+	console.log('evt.to: ', evt.to);
+	if (newIndex === oldIndex && evt.from === evt.to) {
+		console.log('Позиция не изменилась');
+		return;
+	}
+
+	// Ждем обновления v-model после перемещения
+	await nextTick();
+
+	// Получаем ID карточки из события - пробуем разные способы
+	let cardId = null;
+	
+	// Способ 1: из _underlying_vm_ (Vue 3) - самый надежный
+	if (evt.item?._underlying_vm_?._id) {
+		cardId = evt.item._underlying_vm_._id;
+		console.log('Получен cardId из _underlying_vm_:', cardId);
+	}
+	// Способ 2: из element
+	else if (evt.item?.element?._id) {
+		cardId = evt.item.element._id;
+		console.log('Получен cardId из element:', cardId);
+	}
+	// Способ 3: из нового списка по индексу (vuedraggable уже обновил v-model)
+	else if (newIndex !== undefined && newIndex !== null && evt.to) {
+		const toListId = evt.to?.dataset?.listId || evt.to?.getAttribute?.('data-list-id');
+		if (toListId) {
+			const toList = localLists.value.find(l => l._id === toListId);
+			if (toList && toList.cards && toList.cards[newIndex]) {
+				cardId = toList.cards[newIndex]._id;
+				console.log('Получен cardId из нового списка по индексу:', cardId);
+			}
+		}
+	}
+
+	if (!cardId) {
+		console.error('Не удалось получить cardId из события', evt);
 		await fetchBoard();
 		return;
 	}
 
-	const newPosition = evt.newIndex;
-	if (newPosition === undefined || newPosition === null) {
+	// Определяем новый список (куда переместили карточку)
+	let newListId = null;
+	
+	// Способ 1: ищем карточку в обновленных списках (vuedraggable уже обновил v-model)
+	const cardInLists = localLists.value.find(list => 
+		list.cards?.some(c => c._id === cardId)
+	);
+	if (cardInLists) {
+		newListId = cardInLists._id;
+		console.log('Найден newListId через поиск карточки:', newListId);
+	}
+	
+	// Способ 2: из data-атрибута целевого элемента (если не нашли через поиск)
+	if (!newListId && evt.to) {
+		newListId = evt.to.dataset?.listId || evt.to.getAttribute?.('data-list-id');
+		
+		// Если не нашли, ищем в родительских элементах
+		if (!newListId) {
+			let parent = evt.to.parentElement;
+			let depth = 0;
+			while (parent && !newListId && depth < 10) {
+				newListId = parent.dataset?.listId || parent.getAttribute?.('data-list-id');
+				parent = parent.parentElement;
+				depth++;
+			}
+		}
+		
+		if (newListId) {
+			console.log('Найден newListId через DOM:', newListId);
+		}
+	}
+	
+	if (!newListId) {
+		console.error('Не удалось определить newListId', evt);
 		await fetchBoard();
 		return;
 	}
 
-	const result = await cardComposable.move(card._id, listId, newPosition);
+	console.log('Перемещение карточки:', { cardId, newListId, newIndex });
+
+	const result = await cardComposable.move(cardId, newListId, newIndex);
 	if (result.success) {
+		console.log('Карточка успешно перемещена');
 		await fetchBoard();
 	} else {
+		console.error('Ошибка перемещения карточки:', result);
 		await fetchBoard();
 	}
 };
@@ -306,6 +388,7 @@ onUnmounted(() => {
 						<ListCard
 							:list="list"
 							:board="board"
+							:on-card-drag-end="onCardDragEnd"
 							@update-list="updateList"
 							@delete-list="deleteList"
 							@add-card="showAddCard"
